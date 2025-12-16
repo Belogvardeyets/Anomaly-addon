@@ -1,0 +1,57 @@
+-- gamedata/scripts/modxml_buryy.script
+
+-- Функция для добавления нового контента через DXML
+function on_xml_read()
+    RegisterScriptCallback("on_xml_read", function(xml_file_name, xml_obj)
+        
+        -- ===============================================
+        -- 1. ИНЪЕКЦИЯ ПРОФИЛЯ (buryy_desc.xml -> character_desc_general_stalker.xml)
+        -- ===============================================
+        local profiles_xml = [[gameplay\profiles\character_desc_general_stalker.xml]]
+
+        if xml_file_name == profiles_xml then
+            local root_el = xml_obj:query("xml")
+            if root_el[1] then
+                local el = root_el[1]
+                -- Инжектируем профиль Бурого (ID: buryy_unique)
+                xml_obj:insertFromXMLFile([[gameplay\profiles\buryy_desc.xml]], el, #el.kids)
+                printf("DXML: Профиль Бурого (buryy_unique) успешно инжектирован в profiles.")
+            end
+        end
+
+        -- ===============================================
+        -- 2. ИНЪЕКЦИЯ ID ПЕРСОНАЖА (npc_profile_buryy.xml -> npc_profile.xml)
+        -- ===============================================
+        local npc_profile_xml = [[gameplay\npc_profile.xml]]
+        
+        if xml_file_name == npc_profile_xml then
+            local root_el = xml_obj:query("xml")
+            if root_el[1] then
+                local el = root_el[1]
+                -- Инжектируем связку ID спавна (pri_buryy_sniper) с ID профиля (buryy_unique)
+                xml_obj:insertFromXMLFile([[gameplay\profiles\npc_profile_buryy.xml]], el, #el.kids)
+                printf("DXML: ID Бурого (pri_buryy_sniper) добавлен в npc_profile.")
+            end
+        end
+
+        -- ===============================================
+        -- 3. ИНЪЕКЦИЯ ДИАЛОГА (buryy_dialog.xml -> dialogs.xml)
+        -- ===============================================
+        local dialogs_xml = [[gameplay\dialogs.xml]]
+
+        if xml_file_name == dialogs_xml then
+            local root_el = xml_obj:query("xml")
+            if root_el[1] then
+                local el = root_el[1]
+                
+                -- Вставляем #include для нашего файла диалога
+                -- Файл находится по пути: configs/text/rus/buryy_dialog.xml (у меня configs/text/rus/buryy_dialog_strings.xml и в папке configs/dialog/buryy_dialog.xml)
+                local dialog_include_string = [[#include "text\rus\buryy_dialog.xml"]]
+                
+                xml_obj:insertFromXMLString(dialog_include_string, el, #el.kids)
+                printf("DXML: Ссылка на диалог Бурого инжектирована в dialogs.xml.")
+            end
+        end
+
+    end)
+end
