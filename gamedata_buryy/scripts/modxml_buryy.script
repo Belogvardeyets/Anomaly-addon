@@ -1,0 +1,47 @@
+local STORY_ID_BURYY = "buryy_unique" 
+local SPAWN_SECTION = "spawn_sections_buryy"
+
+----------------------------------------------------------------
+-- 1. РЕГИСТРАЦИЯ ДАННЫХ (XML)
+----------------------------------------------------------------
+function on_game_start()
+    -- Колбэк для вставки персонажа в базу игры
+    RegisterScriptCallback("on_xml_read", function(xml_file_name, xml_obj)
+        -- Регистрация профиля (чтобы не было ошибки GetById)
+        if xml_file_name == [[gameplay\npc_profile.xml]] then
+            xml_obj:insertFromXMLFile([[gameplay\profiles\npc_profile_buryy.xml]])
+        end
+
+        -- Вставка описания (внешность, инвентарь)
+        if xml_file_name == [[gameplay\character_desc_general.xml]] or 
+           xml_file_name == [[gameplay\character_desc_underpass.xml]] or
+           xml_file_name == [[gameplay\character_desc_pripyat.xml]] then
+            xml_obj:insertFromXMLFile([[gameplay\character_desc_buryy.xml]])
+        end
+    end)
+
+    -- Колбэк для физического спавна НПС в мире
+    RegisterScriptCallback("actor_on_first_update", spawn_buryy_failsafe)
+end
+
+----------------------------------------------------------------
+-- 2. ФУНКЦИЯ СПАВНА
+----------------------------------------------------------------
+function spawn_buryy_failsafe()
+    local sim = alife()
+    if not sim then return end
+    
+    -- Проверяем, не заспавнен ли он уже
+    if sim:story_object(STORY_ID_BURYY) then 
+        return 
+    end
+
+    -- Спавним только если игрок в Припяти
+    if level.name() == "l11_pripyat" then
+        local se_obj = sim:create(SPAWN_SECTION, vector():set(-19.614, 0.135, 204.504), 79673, 2985)
+        if se_obj then
+            sim:assign_story_id(se_obj.id, STORY_ID_BURYY)
+            printf("[BURYY] Успешный спавн!")
+        end
+    end
+end
