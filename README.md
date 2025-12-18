@@ -15,3 +15,6 @@
 2. Скачиваем xray-monolith https://github.com/themrdemonized/xray-monolith -> распаковываем с заменой файлов (инструкция у автора движка есть)
 3. Закидываем папку с аддоном в корень Anomaly
 4. Запускаем игру через AnomalyLauncher
+
+Благодарю за помощь в создании аддона: 
+PriestSL
