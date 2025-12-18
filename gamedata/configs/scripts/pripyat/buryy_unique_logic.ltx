@@ -1,0 +1,21 @@
+[logic]
+active = remark@greet
+
+[remark@greet]
+anim = wait_na
+target = story | actor
+combat_ignore_cond = {=check_npc_name(buryy_unique) -buryy_dialog_done} true
+combat_ignore_keep_helpers = true
+invulnerable = {-buryy_dialog_done} true, false
+meet = meet
+on_info = {+buryy_dialog_done} nil
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {-buryy_dialog_done} true, false
+trade_enable = false
