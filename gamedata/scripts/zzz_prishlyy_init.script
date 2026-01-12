@@ -1,0 +1,52 @@
+local TIME_QUEST_DELAY = 10
+local TASK_ID = "prishlyy_find_buryy"
+
+function on_game_start()
+
+    RegisterScriptCallback("actor_on_first_update", prishlyy_try_init)
+
+    RegisterScriptCallback("npc_on_death_callback", check_buryy_death)
+end
+
+
+local function give_task_safe(task_id)
+    local manager = task_manager.get_task_manager()
+    manager:give_task(task_id)
+    printf("prishlyy: task '%s' given", tostring(task_id))
+    return true
+end
+
+local function send_prishlyy_news(subject_id, body_id, icon)
+    local subject = game.translate_string(subject_id)
+    local body = game.translate_string(body_id)
+    db.actor:give_game_news(subject, body, icon or "", 0, 10000)
+end
+
+function prishlyy_try_init()
+    if db.actor:has_info("prishlyy_init_done") then return end
+
+    CreateTimeEvent("buriy_quest_giver", "buriy_quest_giver", TIME_QUEST_DELAY, function() 
+        send_prishlyy_news("prishlyy_find_buryy_cst", "st_prishlyy_pda_message", "ui_inGame2_PD_Torgovets_informatsiey")
+        give_task_safe(TASK_ID)
+        db.actor:give_info_portion("prishlyy_init_done")
+        return true 
+    end)
+end
+
+function check_buryy_death(victim, who)
+    if victim and victim:section() == "spawn_sections_buryy" then
+        
+        db.actor:give_info_portion("buryy_unique_dead")
+        printf("prishlyy: info portion given")
+
+
+        CreateTimeEvent("buryy_news_delay", "buryy_news_delay", 0.5, function()
+            
+            local note = game.translate_string("prishlyy_find_buryy_complete")
+            db.actor:give_game_news(note, note, "ui_inGame2_PD_Torgovets_informatsiey", 0, 10000)
+            
+            printf("prishlyy: personal note displayed")
+            return true
+        end)
+    end
+end

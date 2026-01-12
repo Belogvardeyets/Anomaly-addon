@@ -1,0 +1,35 @@
+[logic]
+active = remark@greet
+on_death = death
+on_hit = hit
+
+[death]
+on_info = %+buryy_unique_dead%
+
+[hit]
+on_info = {=hit_by_actor} %+buryy_dialog_done%
+
+[remark@greet]
+anim = wait_na
+target = story | actor
+combat_ignore_cond = {-buryy_dialog_done} true
+meet = meet
+danger = danger
+on_death = death
+on_info = {+buryy_dialog_done} remark@attack
+
+[remark@attack]
+anim = threat_fire
+target = actor                                 
+combat_ignore_cond = false
+on_death = death                  
+on_info = {=dist_to_actor_ge(80)} remark@greet
+
+
+[meet]
+use = {-buryy_dialog_done} true, false
+meet_dialog = buryy_dialog
+
+
+[danger]
+active = 0
